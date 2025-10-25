@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { View, Text, Button, Alert } from "react-native";
+import { View, Text, Button, Alert, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   useGlobalRecording,
   requestMicrophonePermission,
@@ -12,9 +13,11 @@ import {
   registerForPushNotificationsAsync,
   sendPushTokenToBackend,
   setupNotificationHandler,
-} from "../../utils/notifications";
+} from "../../../utils/notifications";
+import { useTheme } from "@/contexts/ThemeContext";
 
 export default function ScreenRecorderExample() {
+  const { theme } = useTheme();
   // Register for push notifications when app starts
   useEffect(() => {
     // Configure notification handler to show banners in foreground
@@ -116,17 +119,40 @@ export default function ScreenRecorderExample() {
   };
 
   return (
-    <View style={{ flex: 1, justifyContent: "center", padding: 20 }}>
-      <Text style={{ fontSize: 18, marginBottom: 20, textAlign: "center" }}>
-        Screen Recorder Demo
-      </Text>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
+      <View style={styles.content}>
+        <Text style={[styles.title, { color: theme.foreground }]}>
+          Screen Recorder Demo
+        </Text>
 
-      <Button title="Start Global Recordingg" onPress={handleStartRecording} />
-      <Button title="Stop Recording" onPress={handleStopRecording} />
+        <Button title="Start Global Recording" onPress={handleStartRecording} />
+        <Button title="Stop Recording" onPress={handleStopRecording} />
 
-      {isRecording && (
-        <Text style={{ marginTop: 10 }}>Recording is active…</Text>
-      )}
-    </View>
+        {isRecording && (
+          <Text style={[styles.statusText, { color: theme.foreground }]}>
+            Recording is active…
+          </Text>
+        )}
+      </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: "center",
+    padding: 20,
+  },
+  title: {
+    fontSize: 18,
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  statusText: {
+    marginTop: 10,
+  },
+});
