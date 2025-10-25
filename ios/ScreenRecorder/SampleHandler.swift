@@ -114,14 +114,21 @@ final class SampleHandler: RPBroadcastSampleHandler {
 
   /// Extracts frame from sample buffer and uploads to API
   private func extractAndUploadFrame(from sampleBuffer: CMSampleBuffer) {
-    guard let image = imageFromSampleBuffer(sampleBuffer),
-          let base64 = imageToBase64JPEG(image, quality: 0.75) else {
+    guard let image = imageFromSampleBuffer(sampleBuffer) else {
       print("❌ Frame extraction failed")
       return
     }
 
-    print("✅ Extracted frame #\(frameCounter), size: \(base64.count) bytes")
-    uploadFrameToAPI(base64Image: base64, frameNumber: frameCounter)
+    // Resize for bandwidth optimization
+    let resized = resizeIfNeeded(image, maxDimension: 1080)
+
+    guard let jpegData = resized.jpegData(compressionQuality: 0.75) else {
+      print("❌ JPEG conversion failed")
+      return
+    }
+
+    print("✅ Extracted frame #\(frameCounter), size: \(jpegData.count) bytes")
+    uploadFrameToAPI(jpegData: jpegData, frameNumber: frameCounter)
   }
 
   /// Converts CMSampleBuffer to UIImage
@@ -138,18 +145,6 @@ final class SampleHandler: RPBroadcastSampleHandler {
     }
 
     return UIImage(cgImage: cgImage)
-  }
-
-  /// Converts UIImage to base64-encoded JPEG
-  private func imageToBase64JPEG(_ image: UIImage, quality: CGFloat = 0.75) -> String? {
-    // Resize for bandwidth optimization
-    let resized = resizeIfNeeded(image, maxDimension: 1080)
-
-    guard let jpegData = resized.jpegData(compressionQuality: quality) else {
-      return nil
-    }
-
-    return jpegData.base64EncodedString()
   }
 
   /// Resizes image if larger than max dimension
@@ -171,34 +166,50 @@ final class SampleHandler: RPBroadcastSampleHandler {
     }
   }
 
-  /// Uploads frame to API endpoint
-  private func uploadFrameToAPI(base64Image: String, frameNumber: Int) {
+  /// Uploads frame to API endpoint using multipart/form-data
+  private func uploadFrameToAPI(jpegData: Data, frameNumber: Int) {
     guard let url = URL(string: apiEndpoint) else { return }
 
+    let boundary = "Boundary-\(UUID().uuidString)"
     var request = URLRequest(url: url)
     request.httpMethod = "POST"
-    request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+    request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
 
-    let payload: [String: Any] = [
-      "frame": base64Image,
-      "timestamp": Int(Date().timeIntervalSince1970 * 1000),
-      "frameNumber": frameNumber,
-      "format": "jpeg",
-      "quality": 0.75
-    ]
+    var body = Data()
 
-    guard let jsonData = try? JSONSerialization.data(withJSONObject: payload) else {
-      print("❌ JSON serialization failed")
-      return
-    }
+    // Add image file
+    body.append("--\(boundary)\r\n".data(using: .utf8)!)
+    body.append("Content-Disposition: form-data; name=\"frame\"; filename=\"frame\(frameNumber).jpg\"\r\n".data(using: .utf8)!)
+    body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
+    body.append(jpegData)
+    body.append("\r\n".data(using: .utf8)!)
 
-    request.httpBody = jsonData
+    // Add metadata fields
+    body.append("--\(boundary)\r\n".data(using: .utf8)!)
+    body.append("Content-Disposition: form-data; name=\"timestamp\"\r\n\r\n".data(using: .utf8)!)
+    body.append("\(Int(Date().timeIntervalSince1970 * 1000))".data(using: .utf8)!)
+    body.append("\r\n".data(using: .utf8)!)
+
+    body.append("--\(boundary)\r\n".data(using: .utf8)!)
+    body.append("Content-Disposition: form-data; name=\"frameNumber\"\r\n\r\n".data(using: .utf8)!)
+    body.append("\(frameNumber)".data(using: .utf8)!)
+    body.append("\r\n".data(using: .utf8)!)
+
+    body.append("--\(boundary)\r\n".data(using: .utf8)!)
+    body.append("Content-Disposition: form-data; name=\"format\"\r\n\r\n".data(using: .utf8)!)
+    body.append("jpeg".data(using: .utf8)!)
+    body.append("\r\n".data(using: .utf8)!)
+
+    // Close boundary
+    body.append("--\(boundary)--\r\n".data(using: .utf8)!)
+
+    request.httpBody = body
 
     uploadSession.dataTask(with: request) { data, response, error in
       if let error = error {
         print("❌ Upload error frame #\(frameNumber): \(error.localizedDescription)")
       } else if let httpResponse = response as? HTTPURLResponse {
-        print("✅ Uploaded frame #\(frameNumber): HTTP \(httpResponse.statusCode)")
+        print("✅ Uploaded frame #\(frameNumber): HTTP \(httpResponse.statusCode), size: \(jpegData.count) bytes")
       }
     }.resume()
   }

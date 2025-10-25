@@ -3,9 +3,9 @@
 <plist version="1.0">
   <dict>
     <key>BroadcastExtensionAppGroupIdentifier</key>
-    <string>group.com.ferran9908.cc.screenrecording</string>
+    <string>group.com.ferran9908.cclove.screenrecording</string>
     <key>BroadcastExtensionBundleIdentifier</key>
-    <string>com.ferran9908.cc.ScreenRecorder</string>
+    <string>com.ferran9908.cclove.ScreenRecorder</string>
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
     <key>CFBundleDevelopmentRegion</key>
@@ -32,7 +32,7 @@
         <key>CFBundleURLSchemes</key>
         <array>
           <string>cc</string>
-          <string>com.ferran9908.cc</string>
+          <string>com.ferran9908.cclove</string>
         </array>
       </dict>
       <dict>

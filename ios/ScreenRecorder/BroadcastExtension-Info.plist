@@ -42,20 +42,6 @@
     </dict>
 
     <key>BroadcastExtensionAppGroupIdentifier</key>
-    <string>group.com.ferran9908.cc.screenrecording</string>
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-      <key>NSExceptionDomains</key>
-      <dict>
-        <key>cc-love.vercel.app</key>
-        <dict>
-          <key>NSExceptionAllowsInsecureHTTPLoads</key>
-          <false/>
-          <key>NSIncludesSubdomains</key>
-          <true/>
-        </dict>
-      </dict>
-    </dict>
+    <string>group.com.ferran9908.cclove.screenrecording</string>
   </dict>
 </plist>

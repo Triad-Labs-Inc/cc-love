@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { View, Text, Button, Alert } from "react-native";
 import {
   useGlobalRecording,
@@ -8,8 +8,34 @@ import {
   startGlobalRecording,
   stopGlobalRecording,
 } from "react-native-nitro-screen-recorder";
+import { registerForPushNotificationsAsync, sendPushTokenToBackend } from "../../utils/notifications";
 
 export default function ScreenRecorderExample() {
+  // Register for push notifications when app starts
+  useEffect(() => {
+    async function setupPushNotifications() {
+      try {
+        const tokenData = await registerForPushNotificationsAsync();
+        if (tokenData) {
+          console.log('Successfully registered for push notifications');
+          // Send token to backend
+          const success = await sendPushTokenToBackend(tokenData);
+          if (success) {
+            console.log('Token sent to backend successfully');
+          } else {
+            console.warn('Failed to send token to backend');
+          }
+        } else {
+          console.warn('Failed to register for push notifications');
+        }
+      } catch (error) {
+        console.error('Error setting up push notifications:', error);
+      }
+    }
+
+    setupPushNotifications();
+  }, []);
+
   const { isRecording } = useGlobalRecording({
     onRecordingStarted: () => {
       Alert.alert("Recording started");

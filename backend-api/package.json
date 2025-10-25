@@ -1,0 +1,16 @@
+{
+  "name": "cc-backend-api",
+  "version": "1.0.0",
+  "description": "Backend API for push notifications",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "expo-server-sdk": "^3.10.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  }
+}

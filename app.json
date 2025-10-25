@@ -10,7 +10,12 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.ferran9908.cc"
+      "bundleIdentifier": "com.ferran9908.cclove",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera for screen recording with camera overlay",
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to access your microphone for screen recording with audio"
+      },
+      "appleTeamId": "6MHK62446D"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +26,13 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.ferran9908.cc"
+      "package": "com.ferran9908.cc",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION",
+        "android.permission.POST_NOTIFICATIONS"
+      ]
     },
     "web": {
       "output": "static",
@@ -42,6 +53,12 @@
         }
       ],
       [
+        "expo-notifications",
+        {
+          "mode": "production"
+        }
+      ],
+      [
         "react-native-nitro-screen-recorder",
         {
           "enableCameraPermission": true,
@@ -49,8 +66,8 @@
           "enableMicrophonePermission": true,
           "microphonePermissionText": "Allow $(PRODUCT_NAME) to access your microphone for screen recording with audio",
           "iosBroadcastExtensionTargetName": "ScreenRecorder",
-          "iosAppGroupIdentifier": "group.com.ferran9908.cc.screenrecording",
-          "iosExtensionBundleIdentifier": "com.ferran9908.cc.ScreenRecorder",
+          "iosAppGroupIdentifier": "group.com.ferran9908.cclove.screenrecording",
+          "iosExtensionBundleIdentifier": "com.ferran9908.cclove.ScreenRecorder",
           "showPluginLogs": false
         }
       ]
@@ -58,6 +75,30 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "build": {
+          "experimental": {
+            "ios": {
+              "appExtensions": [
+                {
+                  "targetName": "ScreenRecorder",
+                  "bundleIdentifier": "com.ferran9908.cclove.ScreenRecorder",
+                  "entitlements": {
+                    "com.apple.security.application-groups": [
+                      "group.com.ferran9908.cclove.screenrecording"
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        },
+        "projectId": "3db85d94-6dcc-4830-9e68-ea866c064394"
+      }
+    },
+    "owner": "ferran9908"
   }
 }
