@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Button, Alert, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
@@ -15,19 +15,43 @@ import {
   setupNotificationHandler,
 } from "../../../utils/notifications";
 import { useTheme } from "@/contexts/ThemeContext";
+import { getDeviceId } from "@/utils/device";
+import * as Notifications from 'expo-notifications';
 
 export default function ScreenRecorderExample() {
   const { theme } = useTheme();
+  const [currentDeviceId, setCurrentDeviceId] = useState<string>('');
+
   // Register for push notifications when app starts
   useEffect(() => {
     // Configure notification handler to show banners in foreground
     setupNotificationHandler();
+
+    // Load device ID for debugging
+    getDeviceId().then(id => {
+      setCurrentDeviceId(id);
+      console.log('[DEBUG] Current device ID:', id);
+    });
+
+    // Listen for incoming notifications to see their data
+    const notificationListener = Notifications.addNotificationReceivedListener(notification => {
+      console.log('[DEBUG] Notification received, full data:', JSON.stringify(notification, null, 2));
+      const data = notification.request.content.data;
+      console.log('[DEBUG] Notification data object:', data);
+      if (data.deviceId) {
+        console.log('[DEBUG] DeviceId in notification:', data.deviceId);
+      }
+      if (data.conversationId) {
+        console.log('[DEBUG] ConversationId in notification:', data.conversationId);
+      }
+    });
 
     async function setupPushNotifications() {
       try {
         const tokenData = await registerForPushNotificationsAsync();
         if (tokenData) {
           console.log("Successfully registered for push notifications");
+          console.log("[DEBUG] Token data:", JSON.stringify(tokenData, null, 2));
           // Send token to backend
           const success = await sendPushTokenToBackend(tokenData);
           if (success) {
@@ -44,6 +68,10 @@ export default function ScreenRecorderExample() {
     }
 
     setupPushNotifications();
+
+    return () => {
+      notificationListener.remove();
+    };
   }, []);
 
   const { isRecording } = useGlobalRecording({
@@ -125,6 +153,15 @@ export default function ScreenRecorderExample() {
           Screen Recorder Demo
         </Text>
 
+        {currentDeviceId && (
+          <View style={styles.debugContainer}>
+            <Text style={[styles.debugLabel, { color: theme.mutedForeground }]}>Device ID:</Text>
+            <Text style={[styles.debugValue, { color: theme.foreground }]} selectable>
+              {currentDeviceId}
+            </Text>
+          </View>
+        )}
+
         <Button title="Start Global Recording" onPress={handleStartRecording} />
         <Button title="Stop Recording" onPress={handleStopRecording} />
 
@@ -151,6 +188,21 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginBottom: 20,
     textAlign: "center",
+  },
+  debugContainer: {
+    backgroundColor: 'rgba(128, 128, 128, 0.1)',
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 20,
+  },
+  debugLabel: {
+    fontSize: 12,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  debugValue: {
+    fontSize: 11,
+    fontFamily: 'monospace',
   },
   statusText: {
     marginTop: 10,

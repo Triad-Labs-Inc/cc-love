@@ -2,10 +2,11 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
 import { Platform } from 'react-native';
+import { getDeviceId } from './device';
 
 export interface PushTokenData {
   token: string;
-  deviceId: string | null;
+  deviceId: string;
   deviceName: string | null;
   platform: string;
 }
@@ -60,17 +61,21 @@ export async function registerForPushNotificationsAsync(): Promise<PushTokenData
     })).data;
 
     console.log('Push token:', token);
+
+    // Get the consistent device ID
+    const deviceId = await getDeviceId();
+    console.log('Using device ID:', deviceId);
+
+    return {
+      token,
+      deviceId, // Use consistent device ID from device.ts
+      deviceName: Device.deviceName,
+      platform: Platform.OS,
+    };
   } catch (error) {
     console.error('Error getting push token:', error);
     return null;
   }
-
-  return {
-    token,
-    deviceId: token, // Use push token as unique device identifier
-    deviceName: Device.deviceName,
-    platform: Platform.OS,
-  };
 }
 
 /**
