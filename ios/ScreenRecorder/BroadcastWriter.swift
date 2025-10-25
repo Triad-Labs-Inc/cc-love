@@ -96,8 +96,8 @@ public final class BroadcastWriter {
   private var audioSampleRate: Double {
     AVAudioSession.sharedInstance().sampleRate
   }
-  private lazy var audioInput: AVAssetWriterInput = {
 
+  private func makeAudioInput() -> AVAssetWriterInput {
     var audioSettings: [String: Any] = [
       AVFormatIDKey: kAudioFormatMPEG4AAC,
       AVNumberOfChannelsKey: 1,
@@ -109,20 +109,14 @@ public final class BroadcastWriter {
     )
     input.expectsMediaDataInRealTime = true
     return input
+  }
+
+  private lazy var audioInput: AVAssetWriterInput = {
+    return makeAudioInput()
   }()
 
   private lazy var microphoneInput: AVAssetWriterInput = {
-    var audioSettings: [String: Any] = [
-      AVFormatIDKey: kAudioFormatMPEG4AAC,
-      AVNumberOfChannelsKey: 1,
-      AVSampleRateKey: audioSampleRate,
-    ]
-    let input: AVAssetWriterInput = .init(
-      mediaType: .audio,
-      outputSettings: audioSettings
-    )
-    input.expectsMediaDataInRealTime = true
-    return input
+    return makeAudioInput()
   }()
 
   private lazy var inputs: [AVAssetWriterInput] = [
@@ -286,28 +280,23 @@ extension BroadcastWriter {
     assetWriterSessionStarted = true
   }
 
-  fileprivate func captureVideoOutput(_ sampleBuffer: CMSampleBuffer) -> Bool {
-    guard videoInput.isReadyForMoreMediaData else {
-      debugPrint("audioInput is not ready")
+  private func appendSampleBuffer(_ sampleBuffer: CMSampleBuffer, to input: AVAssetWriterInput, debugName: String) -> Bool {
+    guard input.isReadyForMoreMediaData else {
+      debugPrint("\(debugName) is not ready")
       return false
     }
-    return videoInput.append(sampleBuffer)
+    return input.append(sampleBuffer)
+  }
+
+  fileprivate func captureVideoOutput(_ sampleBuffer: CMSampleBuffer) -> Bool {
+    return appendSampleBuffer(sampleBuffer, to: videoInput, debugName: "videoInput")
   }
 
   fileprivate func captureAudioOutput(_ sampleBuffer: CMSampleBuffer) -> Bool {
-    guard audioInput.isReadyForMoreMediaData else {
-      debugPrint("audioInput is not ready")
-      return false
-    }
-    return audioInput.append(sampleBuffer)
+    return appendSampleBuffer(sampleBuffer, to: audioInput, debugName: "audioInput")
   }
 
   fileprivate func captureMicrophoneOutput(_ sampleBuffer: CMSampleBuffer) -> Bool {
-
-    guard microphoneInput.isReadyForMoreMediaData else {
-      debugPrint("microphoneInput is not ready")
-      return false
-    }
-    return microphoneInput.append(sampleBuffer)
+    return appendSampleBuffer(sampleBuffer, to: microphoneInput, debugName: "microphoneInput")
   }
 }

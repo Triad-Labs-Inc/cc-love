@@ -8,28 +8,35 @@ import {
   startGlobalRecording,
   stopGlobalRecording,
 } from "react-native-nitro-screen-recorder";
-import { registerForPushNotificationsAsync, sendPushTokenToBackend } from "../../utils/notifications";
+import {
+  registerForPushNotificationsAsync,
+  sendPushTokenToBackend,
+  setupNotificationHandler,
+} from "../../utils/notifications";
 
 export default function ScreenRecorderExample() {
   // Register for push notifications when app starts
   useEffect(() => {
+    // Configure notification handler to show banners in foreground
+    setupNotificationHandler();
+
     async function setupPushNotifications() {
       try {
         const tokenData = await registerForPushNotificationsAsync();
         if (tokenData) {
-          console.log('Successfully registered for push notifications');
+          console.log("Successfully registered for push notifications");
           // Send token to backend
           const success = await sendPushTokenToBackend(tokenData);
           if (success) {
-            console.log('Token sent to backend successfully');
+            console.log("Token sent to backend successfully");
           } else {
-            console.warn('Failed to send token to backend');
+            console.warn("Failed to send token to backend");
           }
         } else {
-          console.warn('Failed to register for push notifications');
+          console.warn("Failed to register for push notifications");
         }
       } catch (error) {
-        console.error('Error setting up push notifications:', error);
+        console.error("Error setting up push notifications:", error);
       }
     }
 
@@ -114,7 +121,7 @@ export default function ScreenRecorderExample() {
         Screen Recorder Demo
       </Text>
 
-      <Button title="Start Global Recording" onPress={handleStartRecording} />
+      <Button title="Start Global Recordingg" onPress={handleStartRecording} />
       <Button title="Stop Recording" onPress={handleStopRecording} />
 
       {isRecording && (

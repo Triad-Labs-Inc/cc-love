@@ -10,6 +10,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		23568E4CE6144D70AE79175E /* BroadcastHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 5CCFCD035F6E4ABD863057A8 /* BroadcastHelper.m */; };
 		3E461D99554A48A4959DE609 /* SplashScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA286B85B6C04FC6940260E9 /* SplashScreen.storyboard */; };
+		4B778FB0B5C193BA66B24D23 /* FrameUploader.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4739A8EC80A4FE98F77831B /* FrameUploader.swift */; };
 		597D7A4D97314FFB93FCE190 /* SampleHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = A03730DB365A421B8119C0D9 /* SampleHandler.swift */; };
 		5C1CC6B614CA0823AF2A4C69 /* BroadcastExtension-PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 37A5677B5D2945D893F23B42 /* BroadcastExtension-PrivacyInfo.xcprivacy */; };
 		732A714118664FDB93972EC7 /* ScreenRecorder.appex in Copy Files */ = {isa = PBXBuildFile; fileRef = F171D341F7F8449E9726AE0B /* ScreenRecorder.appex */; };
@@ -69,6 +70,7 @@
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = cc/AppDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* cc-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "cc-Bridging-Header.h"; path = "cc/cc-Bridging-Header.h"; sourceTree = "<group>"; };
 		F171D341F7F8449E9726AE0B /* ScreenRecorder.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = undefined; name = ScreenRecorder.appex; path = ScreenRecorder.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F4739A8EC80A4FE98F77831B /* FrameUploader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FrameUploader.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 				37A5677B5D2945D893F23B42 /* BroadcastExtension-PrivacyInfo.xcprivacy */,
 				3D47FB6D33DF4BA9B9D75B5F /* BroadcastHelper.h */,
 				385442386BF14EA99B07B9EC /* BroadcastExtension-Bridging-Header.h */,
+				F4739A8EC80A4FE98F77831B /* FrameUploader.swift */,
 			);
 			name = ScreenRecorder;
 			path = ScreenRecorder;
@@ -251,12 +254,12 @@
 				LastUpgradeCheck = 1130;
 				TargetAttributes = {
 					13B07F861A680F5B00A75B9A = {
+						DevelopmentTeam = 6MHK62446D;
 						LastSwiftMigration = 1250;
-						DevelopmentTeam = "6MHK62446D";
 						ProvisioningStyle = Automatic;
 					};
 					5D07FED553A84B7DAF686417 = {
-						DevelopmentTeam = "6MHK62446D";
+						DevelopmentTeam = 6MHK62446D;
 						ProvisioningStyle = Automatic;
 					};
 				};
@@ -446,6 +449,7 @@
 				597D7A4D97314FFB93FCE190 /* SampleHandler.swift in Sources */,
 				C3CA81A176D840D0A305C171 /* BroadcastWriter.swift in Sources */,
 				23568E4CE6144D70AE79175E /* BroadcastHelper.m in Sources */,
+				4B778FB0B5C193BA66B24D23 /* FrameUploader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -467,7 +471,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = cc/cc.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6MHK62446D;
 				ENABLE_BITCODE = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"$(inherited)",
@@ -493,9 +500,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
-				DEVELOPMENT_TEAM = "6MHK62446D";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Debug;
 		};
@@ -506,7 +510,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = cc/cc.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6MHK62446D;
 				INFOPLIST_FILE = cc/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -526,9 +533,6 @@
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
-				DEVELOPMENT_TEAM = "6MHK62446D";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
 			};
 			name = Release;
 		};
@@ -655,8 +659,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ScreenRecorder/BroadcastExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6MHK62446D;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -677,8 +683,6 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "ScreenRecorder/BroadcastExtension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				DEVELOPMENT_TEAM = "6MHK62446D";
-				CODE_SIGN_IDENTITY = "Apple Development";
 			};
 			name = Debug;
 		};
@@ -687,8 +691,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = ScreenRecorder/BroadcastExtension.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 6MHK62446D;
 				HEADER_SEARCH_PATHS = "$(SRCROOT)/ScreenRecorder";
 				INFOPLIST_FILE = "ScreenRecorder/BroadcastExtension-Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -705,8 +711,6 @@
 				SWIFT_OBJC_BRIDGING_HEADER = "ScreenRecorder/BroadcastExtension-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				DEVELOPMENT_TEAM = "6MHK62446D";
-				CODE_SIGN_IDENTITY = "Apple Development";
 			};
 			name = Release;
 		};

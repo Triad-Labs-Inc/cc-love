@@ -37,20 +37,8 @@ final class SampleHandler: RPBroadcastSampleHandler {
   private let nodeURL: URL
   private var sawMicBuffers = false
 
-  // Frame extraction properties
-  private var lastFrameExtractTime: Date?
-  private let frameExtractionInterval: TimeInterval = 2.0
-  private var frameCounter: Int = 0
-  private let apiEndpoint = "https://cc-love.vercel.app/api/message"
-
-  // URLSession for frame uploads
-  private lazy var uploadSession: URLSession = {
-    let config = URLSessionConfiguration.ephemeral
-    config.allowsCellularAccess = true
-    config.timeoutIntervalForRequest = 10
-    config.timeoutIntervalForResource = 30
-    return URLSession(configuration: config)
-  }()
+  // Frame uploader instance
+  private var frameUploader: FrameUploader?
 
   // MARK: – Init
   override init() {
@@ -95,125 +83,6 @@ final class SampleHandler: RPBroadcastSampleHandler {
     )
   }
 
-  // MARK: - Frame Extraction
-
-  /// Checks if 2 seconds have elapsed and extracts frame if needed
-  private func checkAndExtractFrame(_ sampleBuffer: CMSampleBuffer) {
-    let now = Date()
-
-    if let last = lastFrameExtractTime {
-      guard now.timeIntervalSince(last) >= frameExtractionInterval else {
-        return
-      }
-    }
-
-    lastFrameExtractTime = now
-    frameCounter += 1
-    extractAndUploadFrame(from: sampleBuffer)
-  }
-
-  /// Extracts frame from sample buffer and uploads to API
-  private func extractAndUploadFrame(from sampleBuffer: CMSampleBuffer) {
-    guard let image = imageFromSampleBuffer(sampleBuffer) else {
-      print("❌ Frame extraction failed")
-      return
-    }
-
-    // Resize for bandwidth optimization
-    let resized = resizeIfNeeded(image, maxDimension: 1080)
-
-    guard let jpegData = resized.jpegData(compressionQuality: 0.75) else {
-      print("❌ JPEG conversion failed")
-      return
-    }
-
-    print("✅ Extracted frame #\(frameCounter), size: \(jpegData.count) bytes")
-    uploadFrameToAPI(jpegData: jpegData, frameNumber: frameCounter)
-  }
-
-  /// Converts CMSampleBuffer to UIImage
-  private func imageFromSampleBuffer(_ buffer: CMSampleBuffer) -> UIImage? {
-    guard let imageBuffer = CMSampleBufferGetImageBuffer(buffer) else {
-      return nil
-    }
-
-    let ciImage = CIImage(cvPixelBuffer: imageBuffer)
-    let context = CIContext()
-
-    guard let cgImage = context.createCGImage(ciImage, from: ciImage.extent) else {
-      return nil
-    }
-
-    return UIImage(cgImage: cgImage)
-  }
-
-  /// Resizes image if larger than max dimension
-  private func resizeIfNeeded(_ image: UIImage, maxDimension: CGFloat) -> UIImage {
-    let size = image.size
-    guard max(size.width, size.height) > maxDimension else {
-      return image
-    }
-
-    let ratio = maxDimension / max(size.width, size.height)
-    let newSize = CGSize(
-      width: size.width * ratio,
-      height: size.height * ratio
-    )
-
-    let renderer = UIGraphicsImageRenderer(size: newSize)
-    return renderer.image { _ in
-      image.draw(in: CGRect(origin: .zero, size: newSize))
-    }
-  }
-
-  /// Uploads frame to API endpoint using multipart/form-data
-  private func uploadFrameToAPI(jpegData: Data, frameNumber: Int) {
-    guard let url = URL(string: apiEndpoint) else { return }
-
-    let boundary = "Boundary-\(UUID().uuidString)"
-    var request = URLRequest(url: url)
-    request.httpMethod = "POST"
-    request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
-
-    var body = Data()
-
-    // Add image file
-    body.append("--\(boundary)\r\n".data(using: .utf8)!)
-    body.append("Content-Disposition: form-data; name=\"frame\"; filename=\"frame\(frameNumber).jpg\"\r\n".data(using: .utf8)!)
-    body.append("Content-Type: image/jpeg\r\n\r\n".data(using: .utf8)!)
-    body.append(jpegData)
-    body.append("\r\n".data(using: .utf8)!)
-
-    // Add metadata fields
-    body.append("--\(boundary)\r\n".data(using: .utf8)!)
-    body.append("Content-Disposition: form-data; name=\"timestamp\"\r\n\r\n".data(using: .utf8)!)
-    body.append("\(Int(Date().timeIntervalSince1970 * 1000))".data(using: .utf8)!)
-    body.append("\r\n".data(using: .utf8)!)
-
-    body.append("--\(boundary)\r\n".data(using: .utf8)!)
-    body.append("Content-Disposition: form-data; name=\"frameNumber\"\r\n\r\n".data(using: .utf8)!)
-    body.append("\(frameNumber)".data(using: .utf8)!)
-    body.append("\r\n".data(using: .utf8)!)
-
-    body.append("--\(boundary)\r\n".data(using: .utf8)!)
-    body.append("Content-Disposition: form-data; name=\"format\"\r\n\r\n".data(using: .utf8)!)
-    body.append("jpeg".data(using: .utf8)!)
-    body.append("\r\n".data(using: .utf8)!)
-
-    // Close boundary
-    body.append("--\(boundary)--\r\n".data(using: .utf8)!)
-
-    request.httpBody = body
-
-    uploadSession.dataTask(with: request) { data, response, error in
-      if let error = error {
-        print("❌ Upload error frame #\(frameNumber): \(error.localizedDescription)")
-      } else if let httpResponse = response as? HTTPURLResponse {
-        print("✅ Uploaded frame #\(frameNumber): HTTP \(httpResponse.statusCode), size: \(jpegData.count) bytes")
-      }
-    }.resume()
-  }
-
   // MARK: – Broadcast lifecycle
   override func broadcastStarted(withSetupInfo setupInfo: [String: NSObject]?) {
     startListeningForStopSignal()
@@ -221,7 +90,7 @@ final class SampleHandler: RPBroadcastSampleHandler {
     guard let groupID = hostAppGroupIdentifier else {
       finishBroadcastWithError(
         NSError(
-          domain: "SampleHandler", 
+          domain: "SampleHandler",
           code: 1,
           userInfo: [NSLocalizedDescriptionKey: "Missing app group identifier"]
         )
@@ -231,6 +100,9 @@ final class SampleHandler: RPBroadcastSampleHandler {
 
     // Clean up old recordings
     cleanupOldRecordings(in: groupID)
+
+    // Initialize FrameUploader
+    frameUploader = FrameUploader(apiEndpoint: "https://cc-love.vercel.app/api/message", frameExtractionInterval: 10.0)
 
     // Start recording
     let screen: UIScreen = .main
@@ -270,7 +142,7 @@ final class SampleHandler: RPBroadcastSampleHandler {
 
     // Extract video frames every 2 seconds for API upload
     if sampleBufferType == .video {
-      checkAndExtractFrame(sampleBuffer)
+      frameUploader?.processVideoSampleBuffer(sampleBuffer)
     }
 
     if sampleBufferType == .audioMic {
@@ -298,9 +170,7 @@ final class SampleHandler: RPBroadcastSampleHandler {
   
   override func broadcastFinished() {
     // Reset frame extraction state
-    print("🛑 Recording stopped. Total frames extracted: \(frameCounter)")
-    lastFrameExtractTime = nil
-    frameCounter = 0
+    frameUploader?.resetState()
 
     guard let writer else { return }
 
