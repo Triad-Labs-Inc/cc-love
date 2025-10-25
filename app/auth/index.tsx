@@ -1,4 +1,5 @@
-import { Text, View, ScrollView, Image, StyleSheet, Alert } from 'react-native';
+import { Text, View, ScrollView, StyleSheet, Alert } from 'react-native';
+import { Image } from 'expo-image';
 import { Button } from '@/components/ui/button';
 import * as WebBrowser from 'expo-web-browser';
 import * as AuthSession from 'expo-auth-session';
@@ -8,25 +9,10 @@ import { useRouter } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
 import ThemeToggle from '@/components/theme-toggle';
 
-// Warm up the browser for better OAuth performance
-export const useWarmUpBrowser = () => {
-  useEffect(() => {
-    // Preloads the browser for Android devices to reduce authentication load time
-    // See: https://docs.expo.dev/guides/authentication/#improving-user-experience
-    void WebBrowser.warmUpAsync();
-    return () => {
-      // Cleanup: closes browser when component unmounts
-      void WebBrowser.coolDownAsync();
-    };
-  }, []);
-};
-
 // Handle any pending authentication sessions
 WebBrowser.maybeCompleteAuthSession();
 
 export default function AuthScreen() {
-  useWarmUpBrowser();
-
   const router = useRouter();
   const { theme } = useTheme();
   const { isSignedIn } = useAuth();
@@ -85,8 +71,12 @@ export default function AuthScreen() {
 
         {/* Logo/Header */}
         <View style={styles.header}>
-          <View style={[styles.logoContainer, { backgroundColor: theme.muted }]}>
-            <Text style={styles.logoText}>📱</Text>
+          <View style={styles.logoContainer}>
+            <Image
+              source={require('@/assets/images/cc-love-logo.png')}
+              style={styles.logoImage}
+              contentFit="contain"
+            />
           </View>
           <Text style={[styles.title, { color: theme.foreground }]}>cc.love</Text>
           <Text style={[styles.subtitle, { color: theme.mutedForeground }]}>
@@ -149,15 +139,13 @@ const styles = StyleSheet.create({
     marginBottom: 60,
   },
   logoContainer: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
+    width: 96,
+    height: 96,
     marginBottom: 20,
   },
-  logoText: {
-    fontSize: 40,
+  logoImage: {
+    width: '100%',
+    height: '100%',
   },
   title: {
     fontSize: 32,

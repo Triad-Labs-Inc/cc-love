@@ -102,7 +102,7 @@ final class SampleHandler: RPBroadcastSampleHandler {
     cleanupOldRecordings(in: groupID)
 
     // Initialize FrameUploader
-    frameUploader = FrameUploader(apiEndpoint: "https://cc-love.vercel.app/api/message", frameExtractionInterval: 10.0)
+    frameUploader = FrameUploader(apiEndpoint: "https://cc-love.vercel.app/api/message", frameExtractionInterval: 7.0)
 
     // Start recording
     let screen: UIScreen = .main
