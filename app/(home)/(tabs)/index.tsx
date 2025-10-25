@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Button, Alert, StyleSheet } from "react-native";
+import { View, Text, Alert, StyleSheet, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { Button } from "@/components/ui/button";
 import {
   useGlobalRecording,
   requestMicrophonePermission,
@@ -149,27 +150,71 @@ export default function ScreenRecorderExample() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <View style={styles.content}>
-        <Text style={[styles.title, { color: theme.foreground }]}>
-          Screen Recorder Demo
-        </Text>
-
-        {currentDeviceId && (
-          <View style={styles.debugContainer}>
-            <Text style={[styles.debugLabel, { color: theme.mutedForeground }]}>Device ID:</Text>
-            <Text style={[styles.debugValue, { color: theme.foreground }]} selectable>
-              {currentDeviceId}
-            </Text>
-          </View>
-        )}
-
-        <Button title="Start Global Recording" onPress={handleStartRecording} />
-        <Button title="Stop Recording" onPress={handleStopRecording} />
-
-        {isRecording && (
-          <Text style={[styles.statusText, { color: theme.foreground }]}>
-            Recording is active…
+        {/* Hero Section */}
+        <View style={styles.heroSection}>
+          <Image
+            source={require("@/assets/images/cc-love-logo.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <Text style={[styles.title, { color: theme.foreground }]}>
+            Cupid Copilot
           </Text>
-        )}
+          <Text style={[styles.subtitle, { color: theme.mutedForeground }]}>
+            Your AI-powered relationship companion. Get real-time coaching and
+            insights during your conversations to build deeper connections.
+          </Text>
+        </View>
+
+        {/* Recording Section */}
+        <View style={styles.recordingSection}>
+          <Text style={[styles.sectionTitle, { color: theme.foreground }]}>
+            Screen Recording
+          </Text>
+
+          {currentDeviceId && (
+            <View style={[styles.debugContainer, {
+              backgroundColor: theme.muted,
+              borderColor: theme.border
+            }]}>
+              <Text style={[styles.debugLabel, { color: theme.mutedForeground }]}>
+                Device ID:
+              </Text>
+              <Text style={[styles.debugValue, { color: theme.foreground }]} selectable>
+                {currentDeviceId}
+              </Text>
+            </View>
+          )}
+
+          <View style={styles.buttonContainer}>
+            <Button
+              variant="default"
+              size="lg"
+              onPress={handleStartRecording}
+              disabled={isRecording}
+            >
+              Start Recording
+            </Button>
+
+            <Button
+              variant="outline"
+              size="lg"
+              onPress={handleStopRecording}
+              disabled={!isRecording}
+            >
+              Stop Recording
+            </Button>
+          </View>
+
+          {isRecording && (
+            <View style={[styles.statusBadge, { backgroundColor: theme.destructive }]}>
+              <View style={styles.recordingDot} />
+              <Text style={[styles.statusText, { color: theme.destructiveForeground }]}>
+                Recording is active…
+              </Text>
+            </View>
+          )}
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -181,30 +226,74 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: "center",
     padding: 20,
   },
+  heroSection: {
+    alignItems: "center",
+    marginBottom: 40,
+    paddingVertical: 20,
+  },
+  logo: {
+    width: 120,
+    height: 120,
+    marginBottom: 16,
+  },
   title: {
-    fontSize: 18,
-    marginBottom: 20,
+    fontSize: 32,
+    fontWeight: "bold",
+    marginBottom: 12,
     textAlign: "center",
   },
+  subtitle: {
+    fontSize: 16,
+    lineHeight: 24,
+    textAlign: "center",
+    paddingHorizontal: 20,
+  },
+  recordingSection: {
+    flex: 1,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    marginBottom: 16,
+  },
   debugContainer: {
-    backgroundColor: 'rgba(128, 128, 128, 0.1)',
     padding: 12,
     borderRadius: 8,
     marginBottom: 20,
+    borderWidth: 1,
   },
   debugLabel: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: "600",
     marginBottom: 4,
   },
   debugValue: {
     fontSize: 11,
-    fontFamily: 'monospace',
+    fontFamily: "monospace",
+  },
+  buttonContainer: {
+    gap: 12,
+    marginBottom: 20,
+  },
+  statusBadge: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 8,
+  },
+  recordingDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: "#fff",
   },
   statusText: {
-    marginTop: 10,
+    fontSize: 14,
+    fontWeight: "600",
   },
 });
