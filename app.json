@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.ferran9908.cc"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ferran9908.cc"
     },
     "web": {
       "output": "static",
@@ -37,6 +39,19 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "react-native-nitro-screen-recorder",
+        {
+          "enableCameraPermission": true,
+          "cameraPermissionText": "Allow $(PRODUCT_NAME) to access your camera for screen recording with camera overlay",
+          "enableMicrophonePermission": true,
+          "microphonePermissionText": "Allow $(PRODUCT_NAME) to access your microphone for screen recording with audio",
+          "iosBroadcastExtensionTargetName": "ScreenRecorder",
+          "iosAppGroupIdentifier": "group.com.ferran9908.cc.screenrecording",
+          "iosExtensionBundleIdentifier": "com.ferran9908.cc.ScreenRecorder",
+          "showPluginLogs": false
         }
       ]
     ],
