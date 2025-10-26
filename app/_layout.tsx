@@ -7,7 +7,6 @@ import * as Notifications from 'expo-notifications';
 import { useEffect, useRef } from 'react';
 import 'react-native-reanimated';
 
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { setupNotificationHandler } from '../utils/notifications';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 
@@ -42,7 +41,7 @@ export const unstable_settings = {
 };
 
 function RootLayoutNav() {
-  const { colorScheme } = useTheme();
+  const { themeName, theme } = useTheme();
   const notificationListener = useRef<Notifications.Subscription>();
   const responseListener = useRef<Notifications.Subscription>();
 
@@ -73,14 +72,31 @@ function RootLayoutNav() {
     };
   }, []);
 
+  // Create navigation theme from current theme
+  const navigationTheme = {
+    dark: themeName === 'red', // Red theme is dark
+    colors: {
+      primary: theme.primary,
+      background: theme.background,
+      card: theme.card,
+      text: theme.foreground,
+      border: theme.border,
+      notification: theme.accent,
+    },
+    fonts: DefaultTheme.fonts, // Use default fonts
+  };
+
+  // Determine status bar style based on background brightness
+  const statusBarStyle = themeName === 'red' ? 'light' : 'dark';
+
   return (
-    <NavigationThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <NavigationThemeProvider value={navigationTheme}>
       <Stack>
         <Stack.Screen name="(home)" options={{ headerShown: false }} />
         <Stack.Screen name="auth" options={{ headerShown: false }} />
         <Stack.Screen name="modal" options={{ presentation: 'modal', title: 'Modal' }} />
       </Stack>
-      <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+      <StatusBar style={statusBarStyle} />
     </NavigationThemeProvider>
   );
 }

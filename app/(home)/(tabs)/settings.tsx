@@ -5,7 +5,7 @@ import { useAuth, useUser } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { Button } from '@/components/ui/button';
 import { useTheme } from '@/contexts/ThemeContext';
-import ThemeToggle from '@/components/theme-toggle';
+import { ThemeSelector } from '@/components/theme-selector';
 
 export default function SettingsScreen() {
   const { signOut } = useAuth();
@@ -81,12 +81,7 @@ export default function SettingsScreen() {
       {/* Theme Section */}
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: theme.foreground }]}>Appearance</Text>
-        <View style={[styles.infoCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-          <View style={styles.infoRow}>
-            <Text style={[styles.infoLabel, { color: theme.mutedForeground }]}>Theme</Text>
-            <ThemeToggle />
-          </View>
-        </View>
+        <ThemeSelector />
       </View>
 
       {/* Account Section */}

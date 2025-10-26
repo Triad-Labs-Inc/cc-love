@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react';
 import { useOAuth, useAuth } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
 import { useTheme } from '@/contexts/ThemeContext';
-import ThemeToggle from '@/components/theme-toggle';
 
 // Handle any pending authentication sessions
 WebBrowser.maybeCompleteAuthSession();
@@ -59,11 +58,6 @@ export default function AuthScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: theme.background }]}>
-      {/* Theme Toggle in top right */}
-      <View style={styles.themeToggleContainer}>
-        <ThemeToggle />
-      </View>
-
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
@@ -118,12 +112,6 @@ export default function AuthScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-  },
-  themeToggleContainer: {
-    position: 'absolute',
-    top: 50,
-    right: 12,
-    zIndex: 10,
   },
   scrollView: {
     flex: 1,
